@@ -1,63 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
-// Ubicación: Scripts/LinkedList/LinkedList.cs
-
 using UnityEngine;
+using System.Collections.Generic;
 
 public class LinkedList
 {
-    public Node Head { get; private set; }
-    public Node Tail { get; private set; }
-    public int Length { get; private set; }
+    public Nodo[,] grid;
+    private int width;
+    private int height;
 
-    public LinkedList(Vector2Int initialPosition)
+    public LinkedList(int width, int height)
     {
-        Node initialNode = new Node(initialPosition);
-        Head = initialNode;
-        Tail = initialNode;
-        Length = 1;
+        this.width = width;
+        this.height = height;
+        grid = new Nodo[width, height];
+        CreateGrid();
     }
 
-    public void AddNode(Vector2Int newPosition)
+    // Crear la lista enlazada que representa el grid
+    private void CreateGrid()
     {
-        Node newNode = new Node(newPosition);
-        Tail.Next = newNode;
-        Tail = newNode;
-        Length++;
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                grid[x, y] = new Nodo(new Vector2Int(x, y));
+
+                if (x > 0) grid[x, y].oeste = grid[x - 1, y];
+                if (x < width - 1) grid[x, y].este = grid[x + 1, y];
+                if (y > 0) grid[x, y].sur = grid[x, y - 1];
+                if (y < height - 1) grid[x, y].norte = grid[x, y + 1];
+            }
+        }
     }
 
-    public void RemoveTail()
+    // Obtener nodo en una posición específica
+    public Nodo GetNodo(Vector2Int position)
     {
-        if (Head == Tail)
+        if (position.x >= 0 && position.x < width && position.y >= 0 && position.y < height)
         {
-            // Solo hay un nodo, no se puede eliminar
-            return;
+            return grid[position.x, position.y];
         }
-
-        Node current = Head;
-        while (current.Next != Tail)
-        {
-            current = current.Next;
-        }
-
-        current.Next = null;
-        Tail = current;
-        Length--;
-    }
-
-    public Vector2Int[] GetPositions()
-    {
-        Vector2Int[] positions = new Vector2Int[Length];
-        Node current = Head;
-        int index = 0;
-
-        while (current != null)
-        {
-            positions[index] = current.Position;
-            current = current.Next;
-            index++;
-        }
-
-        return positions;
+        return null;
     }
 }
